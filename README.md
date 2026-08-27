@@ -26,4 +26,3 @@ dotnet test RoomBooking.sln --configuration Release --no-build --no-restore
 
 The GitHub Actions workflow runs the same restore, build, and test sequence for
 pull requests and pushes targeting `main`.
-
