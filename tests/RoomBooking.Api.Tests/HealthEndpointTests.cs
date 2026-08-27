@@ -1,7 +1,9 @@
 using System.Net;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RoomBooking.Application.Abstractions.Time;
 
 namespace RoomBooking.Api.Tests;
 
@@ -39,5 +41,13 @@ public class HealthEndpointTests : IDisposable
         var response = await client.GetAsync("/health");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [TestMethod]
+    public void ApplicationUsesConfiguredBusinessTimeZone()
+    {
+        var businessTimeZone = factory!.Services.GetRequiredService<IBusinessTimeZone>();
+
+        businessTimeZone.Value.Id.Should().Be("America/Montevideo");
     }
 }

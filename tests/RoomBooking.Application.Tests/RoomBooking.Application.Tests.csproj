@@ -12,14 +12,13 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" PrivateAssets="all" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MSTest.TestAdapter" PrivateAssets="all" />
     <PackageReference Include="MSTest.TestFramework" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\RoomBooking.Api\RoomBooking.Api.csproj" />
+    <ProjectReference Include="..\..\src\RoomBooking.Application\RoomBooking.Application.csproj" />
   </ItemGroup>
 
 </Project>
