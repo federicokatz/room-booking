@@ -15,6 +15,9 @@ namespace RoomBooking.Application.Tests.Agent;
 [TestClass]
 public class AgentToolTests
 {
+    private static readonly TimeZoneInfo MontevideoTimeZone =
+        TimeZoneInfo.FindSystemTimeZoneById("America/Montevideo");
+
     [TestMethod]
     public async Task CreateBookingDelegatesToUseCaseAndUsesCurrentUser()
     {
@@ -24,16 +27,20 @@ public class AgentToolTests
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
             bookings,
-            new StubTimeProvider(TestData.Utc(9))));
+            new StubTimeProvider(TestData.Utc(9))),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync(
-            "{\"roomCode\":\"A\",\"startUtc\":\"2026-09-01T10:00:00+00:00\",\"endUtc\":\"2026-09-01T11:00:00+00:00\",\"title\":\"Interview\",\"attendees\":3}");
+            "{\"roomCode\":\"A\",\"startLocal\":\"2026-09-01T10:00:00\",\"endLocal\":\"2026-09-01T11:00:00\",\"title\":\"Interview\",\"attendees\":3}");
 
         ReadSuccess(result).Should().BeTrue();
         result.Effect.Should().Be(AgentEffects.BookingCreated);
         ReadData(result).TryGetProperty("id", out _).Should().BeFalse();
+        ReadData(result).GetProperty("startLocal").GetDateTime()
+            .Should().Be(new DateTime(2026, 9, 1, 10, 0, 0));
         bookings.Bookings.Should().ContainSingle()
             .Which.OwnerId.Should().Be("User1");
+        bookings.Bookings.Single().Period.StartUtc.Should().Be(TestData.Utc(13));
     }
 
     [TestMethod]
@@ -45,10 +52,11 @@ public class AgentToolTests
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
             bookings,
-            new StubTimeProvider(TestData.Utc(9))));
+            new StubTimeProvider(TestData.Utc(9))),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync(
-            "{\"roomCode\":\"A\",\"startUtc\":\"2026-09-01T10:00:00+00:00\",\"endUtc\":\"2026-09-01T11:00:00+00:00\",\"title\":\"Interview\",\"attendees\":3,\"userId\":\"User2\"}");
+            "{\"roomCode\":\"A\",\"startLocal\":\"2026-09-01T10:00:00\",\"endLocal\":\"2026-09-01T11:00:00\",\"title\":\"Interview\",\"attendees\":3,\"userId\":\"User2\"}");
 
         ReadSuccess(result).Should().BeFalse();
         ReadCode(result).Should().Be("tool.invalid_arguments");
@@ -64,7 +72,8 @@ public class AgentToolTests
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
             bookings,
-            new StubTimeProvider(TestData.Utc(9))));
+            new StubTimeProvider(TestData.Utc(9))),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync("{not-json}");
 
@@ -82,14 +91,15 @@ public class AgentToolTests
         bookings.Bookings.Add(TestData.CreateBooking(
             roomA,
             "User1",
-            TestData.Utc(10),
-            TestData.Utc(11)));
+            TestData.Utc(13),
+            TestData.Utc(14)));
         var tool = new ListAvailableRoomsTool(new ListAvailableRoomsUseCase(
             new FakeRoomRepository([roomA, roomB]),
-            bookings));
+            bookings),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync(
-            "{\"startUtc\":\"2026-09-01T10:00:00+00:00\",\"endUtc\":\"2026-09-01T11:00:00+00:00\",\"attendees\":4}");
+            "{\"startLocal\":\"2026-09-01T10:00:00\",\"endLocal\":\"2026-09-01T11:00:00\",\"attendees\":4}");
 
         var data = ReadData(result);
         data.GetArrayLength().Should().Be(1);
@@ -104,19 +114,22 @@ public class AgentToolTests
         bookings.Bookings.Add(TestData.CreateBooking(
             room,
             "User1",
-            TestData.Utc(10, 30),
-            TestData.Utc(11)));
+            TestData.Utc(13, 30),
+            TestData.Utc(14)));
         var tool = new GetRoomScheduleTool(new GetRoomScheduleUseCase(
             new FakeRoomRepository([room]),
-            bookings));
+            bookings),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync(
-            "{\"roomCode\":\"B\",\"startUtc\":\"2026-09-01T10:00:00+00:00\",\"endUtc\":\"2026-09-01T11:30:00+00:00\"}");
+            "{\"roomCode\":\"B\",\"startLocal\":\"2026-09-01T10:00:00\",\"endLocal\":\"2026-09-01T11:30:00\"}");
 
         var slots = ReadData(result).GetProperty("slots");
         slots.EnumerateArray()
             .Select(slot => slot.GetProperty("isOccupied").GetBoolean())
             .Should().Equal(false, true, false);
+        slots[0].GetProperty("startLocal").GetDateTime()
+            .Should().Be(new DateTime(2026, 9, 1, 10, 0, 0));
     }
 
     [TestMethod]
@@ -140,7 +153,8 @@ public class AgentToolTests
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
             bookings,
-            new StubTimeProvider(TestData.Utc(9))));
+            new StubTimeProvider(TestData.Utc(9))),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync("{}");
 
@@ -164,7 +178,8 @@ public class AgentToolTests
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
             bookings,
-            new StubTimeProvider(TestData.Utc(9))));
+            new StubTimeProvider(TestData.Utc(9))),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync($"{{\"bookingId\":\"{booking.Id}\"}}");
 
@@ -188,7 +203,8 @@ public class AgentToolTests
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
             bookings,
-            new StubTimeProvider(TestData.Utc(9))));
+            new StubTimeProvider(TestData.Utc(9))),
+            new FakeBusinessTimeZone(MontevideoTimeZone));
 
         var result = await tool.ExecuteAsync($"{{\"bookingId\":\"{booking.Id}\"}}");
 
@@ -233,19 +249,26 @@ public class AgentToolTests
                 currentUser,
                 rooms,
                 bookings,
-                timeProvider)),
-            new ListAvailableRoomsTool(new ListAvailableRoomsUseCase(rooms, bookings)),
-            new GetRoomScheduleTool(new GetRoomScheduleUseCase(rooms, bookings)),
+                timeProvider),
+                new FakeBusinessTimeZone(MontevideoTimeZone)),
+            new ListAvailableRoomsTool(
+                new ListAvailableRoomsUseCase(rooms, bookings),
+                new FakeBusinessTimeZone(MontevideoTimeZone)),
+            new GetRoomScheduleTool(
+                new GetRoomScheduleUseCase(rooms, bookings),
+                new FakeBusinessTimeZone(MontevideoTimeZone)),
             new ListMyBookingsTool(new ListMyBookingsUseCase(
                 currentUser,
                 rooms,
                 bookings,
-                timeProvider)),
+                timeProvider),
+                new FakeBusinessTimeZone(MontevideoTimeZone)),
             new CancelBookingTool(new CancelBookingUseCase(
                 currentUser,
                 rooms,
                 bookings,
-                timeProvider))
+                timeProvider),
+                new FakeBusinessTimeZone(MontevideoTimeZone))
         ];
     }
 

@@ -1,36 +1,34 @@
 # Component diagram
 
-This diagram follows a user message from the React client to the assistant response. The browser displays rooms and the signed-in user's bookings, but it does not make booking decisions or call booking mutation endpoints directly.
+This diagram shows what happens from a user chat message to the final assistant response. The React client is served by ASP.NET Core in production, so both use the same origin.
 
 ```mermaid
-flowchart LR
-    User[Authenticated user] --> Client[Browser client / React UI]
-    Client -->|Cookie + X-CSRF-TOKEN| Api[ASP.NET Core API]
-    Api --> Auth[Cookie authentication<br/>and antiforgery validation]
+flowchart TD
+    Client[React client] -->|Chat message| Api[ASP.NET Core API]
+    Api --> Auth[Cookie authentication<br/>and antiforgery]
     Auth --> Chat[ChatAgentService]
-    Chat --> Session[In-memory chat session]
-    Chat --> ModelPort[IChatModel]
-    ModelPort --> Groq[Groq OpenAI-compatible API]
-    Chat --> Tools[Typed tools]
-    Tools --> UseCases[Application use cases]
-    UseCases --> Domain[Domain rules]
-    UseCases --> Repositories[Repository ports]
-    Repositories --> Postgres[(PostgreSQL)]
-    Postgres --> Repositories
-    UseCases --> Tools
-    Tools --> Chat
-    Groq --> ModelPort
-    Chat --> Api
+
+    Chat -->|Initial or follow-up model request via IChatModel| Groq[Groq LLM]
+    Groq -->|Final response| Chat
+    Groq -->|Tool call| Tool[Typed tool]
+    Tool --> UseCase[Application use case]
+    UseCase --> Domain[Domain rules]
+    UseCase --> Repository[Repository]
+    Repository --> Database[(PostgreSQL)]
+    Database --> Repository
+    Repository --> UseCase
+    UseCase --> Tool
+    Tool -->|Structured tool result| Chat
+
+    Chat -->|Assistant response + effects| Api
     Api --> Client
 ```
 
 ## Responsibilities
 
-1. The React client sends the user message with its authenticated cookie and antiforgery token. It refreshes its read-only workspace data after a booking effect.
-2. The API authenticates the request and resolves `ICurrentUser` from the server context.
-3. `ChatAgentService` loads the user-owned session and asks the model to answer or request one of five typed tools.
-4. A requested tool delegates to an existing Application use case; it never talks directly to PostgreSQL and never receives a user identifier.
-5. Application and Domain validate the request. PostgreSQL is the final authority for concurrent booking conflicts.
-6. Tool results return to the model, which produces the final assistant message. The API returns that message and optional UI effects such as `booking_created`.
-
-The model has no authority to bypass business rules, impersonate a user, or claim an operation succeeded without a successful tool result.
+1. The React client sends the user message with the authenticated cookie and antiforgery token.
+2. The API authenticates the request and resolves the current user on the server.
+3. `ChatAgentService` asks the model for a final response or a typed tool call.
+4. A tool delegates to an Application use case. It does not access PostgreSQL and does not receive a user identifier.
+5. Application and Domain enforce booking rules; PostgreSQL is the final protection against concurrent double bookings.
+6. The tool result returns to the model, which produces the final assistant response and optional UI effects.

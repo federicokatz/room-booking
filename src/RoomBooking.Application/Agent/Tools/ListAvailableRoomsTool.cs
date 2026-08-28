@@ -1,21 +1,24 @@
+using RoomBooking.Application.Abstractions.Time;
 using RoomBooking.Application.Bookings.ListAvailableRooms;
 
 namespace RoomBooking.Application.Agent.Tools;
 
-public sealed class ListAvailableRoomsTool(ListAvailableRoomsUseCase useCase) : IAgentTool
+public sealed class ListAvailableRoomsTool(
+    ListAvailableRoomsUseCase useCase,
+    IBusinessTimeZone businessTimeZone) : IAgentTool
 {
     public ChatToolDefinition Definition { get; } = new(
         AgentToolNames.ListAvailableRooms,
-        "Lists rooms that can host the requested attendees and are free for the complete UTC time range.",
+        "Lists rooms that can host the requested attendees and are free for the complete business-local time range.",
         """
         {
           "type": "object",
           "properties": {
-            "startUtc": { "type": "string", "format": "date-time", "description": "UTC start aligned to a 30-minute boundary." },
-            "endUtc": { "type": "string", "format": "date-time", "description": "UTC end aligned to a 30-minute boundary." },
+            "startLocal": { "type": "string", "format": "date-time", "description": "Business-local start time without an offset, aligned to a 30-minute boundary." },
+            "endLocal": { "type": "string", "format": "date-time", "description": "Business-local end time without an offset, aligned to a 30-minute boundary." },
             "attendees": { "type": "integer", "minimum": 1 }
           },
-          "required": ["startUtc", "endUtc", "attendees"],
+          "required": ["startLocal", "endLocal", "attendees"],
           "additionalProperties": false
         }
         """,
@@ -32,10 +35,22 @@ public sealed class ListAvailableRoomsTool(ListAvailableRoomsUseCase useCase) : 
                 "list_available_rooms received invalid arguments.");
         }
 
+        if (!BusinessLocalTimeConverter.TryConvertToUtc(
+                arguments.StartLocal,
+                arguments.EndLocal,
+                businessTimeZone,
+                out var startUtc,
+                out var endUtc))
+        {
+            return AgentToolJson.Failure(
+                "tool.invalid_arguments",
+                "list_available_rooms requires unambiguous business-local date-times without an offset.");
+        }
+
         var result = await useCase.ExecuteAsync(
             new ListAvailableRoomsQuery(
-                arguments.StartUtc,
-                arguments.EndUtc,
+                startUtc,
+                endUtc,
                 arguments.Attendees),
             cancellationToken);
 
@@ -45,7 +60,7 @@ public sealed class ListAvailableRoomsTool(ListAvailableRoomsUseCase useCase) : 
     }
 
     private sealed record ListAvailableRoomsArguments(
-        DateTimeOffset StartUtc,
-        DateTimeOffset EndUtc,
+        DateTime StartLocal,
+        DateTime EndLocal,
         int Attendees);
 }

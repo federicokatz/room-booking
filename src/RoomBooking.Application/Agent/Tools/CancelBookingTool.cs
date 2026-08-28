@@ -1,8 +1,11 @@
+using RoomBooking.Application.Abstractions.Time;
 using RoomBooking.Application.Bookings.CancelBooking;
 
 namespace RoomBooking.Application.Agent.Tools;
 
-public sealed class CancelBookingTool(CancelBookingUseCase useCase) : IAgentTool
+public sealed class CancelBookingTool(
+    CancelBookingUseCase useCase,
+    IBusinessTimeZone businessTimeZone) : IAgentTool
 {
     public ChatToolDefinition Definition { get; } = new(
         AgentToolNames.CancelBooking,
@@ -34,7 +37,7 @@ public sealed class CancelBookingTool(CancelBookingUseCase useCase) : IAgentTool
 
         return result.IsSuccess
             ? AgentToolJson.Success(
-                BookingToolResponse.From(result.Value),
+                BookingToolResponse.From(result.Value, businessTimeZone),
                 AgentEffects.BookingCancelled)
             : AgentToolJson.Failure(result.Error!);
     }

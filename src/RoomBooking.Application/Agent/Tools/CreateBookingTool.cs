@@ -1,8 +1,11 @@
+using RoomBooking.Application.Abstractions.Time;
 using RoomBooking.Application.Bookings.CreateBooking;
 
 namespace RoomBooking.Application.Agent.Tools;
 
-public sealed class CreateBookingTool(CreateBookingUseCase useCase) : IAgentTool
+public sealed class CreateBookingTool(
+    CreateBookingUseCase useCase,
+    IBusinessTimeZone businessTimeZone) : IAgentTool
 {
     public ChatToolDefinition Definition { get; } = new(
         AgentToolNames.CreateBooking,
@@ -12,12 +15,12 @@ public sealed class CreateBookingTool(CreateBookingUseCase useCase) : IAgentTool
           "type": "object",
           "properties": {
             "roomCode": { "type": "string", "enum": ["A", "B", "C", "D", "E"] },
-            "startUtc": { "type": "string", "format": "date-time", "description": "UTC start aligned to a 30-minute boundary." },
-            "endUtc": { "type": "string", "format": "date-time", "description": "UTC end aligned to a 30-minute boundary." },
+            "startLocal": { "type": "string", "format": "date-time", "description": "Business-local start time without an offset, aligned to a 30-minute boundary." },
+            "endLocal": { "type": "string", "format": "date-time", "description": "Business-local end time without an offset, aligned to a 30-minute boundary." },
             "title": { "type": "string" },
             "attendees": { "type": "integer", "minimum": 1 }
           },
-          "required": ["roomCode", "startUtc", "endUtc", "title", "attendees"],
+          "required": ["roomCode", "startLocal", "endLocal", "title", "attendees"],
           "additionalProperties": false
         }
         """,
@@ -34,26 +37,38 @@ public sealed class CreateBookingTool(CreateBookingUseCase useCase) : IAgentTool
                 "create_booking received invalid arguments.");
         }
 
+        if (!BusinessLocalTimeConverter.TryConvertToUtc(
+                arguments.StartLocal,
+                arguments.EndLocal,
+                businessTimeZone,
+                out var startUtc,
+                out var endUtc))
+        {
+            return AgentToolJson.Failure(
+                "tool.invalid_arguments",
+                "create_booking requires unambiguous business-local date-times without an offset.");
+        }
+
         var result = await useCase.ExecuteAsync(
             new CreateBookingCommand(
                 arguments.RoomCode,
-                arguments.StartUtc,
-                arguments.EndUtc,
+                startUtc,
+                endUtc,
                 arguments.Title,
                 arguments.Attendees),
             cancellationToken);
 
         return result.IsSuccess
             ? AgentToolJson.Success(
-                BookingToolResponse.From(result.Value),
+                BookingToolResponse.From(result.Value, businessTimeZone),
                 AgentEffects.BookingCreated)
             : AgentToolJson.Failure(result.Error!);
     }
 
     private sealed record CreateBookingArguments(
         string? RoomCode,
-        DateTimeOffset StartUtc,
-        DateTimeOffset EndUtc,
+        DateTime StartLocal,
+        DateTime EndLocal,
         string? Title,
         int Attendees);
 }

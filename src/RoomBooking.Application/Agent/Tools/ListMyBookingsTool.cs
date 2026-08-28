@@ -1,8 +1,11 @@
+using RoomBooking.Application.Abstractions.Time;
 using RoomBooking.Application.Bookings.ListMyBookings;
 
 namespace RoomBooking.Application.Agent.Tools;
 
-public sealed class ListMyBookingsTool(ListMyBookingsUseCase useCase) : IAgentTool
+public sealed class ListMyBookingsTool(
+    ListMyBookingsUseCase useCase,
+    IBusinessTimeZone businessTimeZone) : IAgentTool
 {
     public ChatToolDefinition Definition { get; } = new(
         AgentToolNames.ListMyBookings,
@@ -30,9 +33,28 @@ public sealed class ListMyBookingsTool(ListMyBookingsUseCase useCase) : IAgentTo
         var result = await useCase.ExecuteAsync(cancellationToken);
 
         return result.IsSuccess
-            ? AgentToolJson.Success(result.Value)
+            ? AgentToolJson.Success(
+                result.Value.Select(booking => new BookingListItemToolResponse(
+                    booking.Id,
+                    booking.RoomCode,
+                    booking.Title,
+                    booking.Attendees,
+                    BusinessLocalTimeConverter.ConvertToLocal(
+                        booking.StartUtc,
+                        businessTimeZone),
+                    BusinessLocalTimeConverter.ConvertToLocal(
+                        booking.EndUtc,
+                        businessTimeZone))).ToArray())
             : AgentToolJson.Failure(result.Error!);
     }
 
     private sealed record EmptyArguments;
+
+    private sealed record BookingListItemToolResponse(
+        Guid Id,
+        string RoomCode,
+        string Title,
+        int Attendees,
+        DateTime StartLocal,
+        DateTime EndLocal);
 }

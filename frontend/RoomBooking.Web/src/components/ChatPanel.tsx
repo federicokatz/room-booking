@@ -57,7 +57,7 @@ export function ChatPanel({ messages, isSending, error, onSend }: ChatPanelProps
   return (
     <section className="chat-panel" aria-labelledby="chat-heading">
       <header className="chat-header">
-        <div><p className="eyebrow"><span className="status-dot" /> ASSISTANT ONLINE</p><h2 id="chat-heading">What are we making room for?</h2></div>
+        <div><p className="eyebrow"><span className="status-dot" /> ASSISTANT ONLINE</p><h2 id="chat-heading">How can I help?</h2></div>
       </header>
       <div className="chat-thread" aria-live="polite">
         {messages.map((item) => <article className={`message message-${item.role}`} key={item.id}><span>{item.role === 'assistant' ? 'ROOM BOOKING' : 'YOU'}</span><div className="message-content"><ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml>{item.content}</ReactMarkdown></div></article>)}

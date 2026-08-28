@@ -1,0 +1,15 @@
+.git
+.github
+.env
+plan
+.vs
+
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/coverage
+**/TestResults
+
+*.user
+*.suo
