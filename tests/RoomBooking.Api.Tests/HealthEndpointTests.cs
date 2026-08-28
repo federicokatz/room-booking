@@ -15,7 +15,7 @@ public class HealthEndpointTests : IDisposable
     [TestInitialize]
     public void Initialize()
     {
-        factory = new WebApplicationFactory<Program>();
+        factory = new RoomBookingWebApplicationFactory();
     }
 
     [TestCleanup]
