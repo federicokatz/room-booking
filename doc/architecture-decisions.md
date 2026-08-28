@@ -67,6 +67,14 @@ User message → LLM → typed tool → Application → Domain → PostgreSQL
 
 Successful and failed outcomes flow back through the tool to the model. The model may explain an outcome but cannot declare a booking successful without a successful tool result.
 
+## Authentication
+
+React and ASP.NET Core will be served from the same origin, so authentication uses an encrypted HttpOnly cookie instead of a bearer token. The cookie uses `SameSite=Lax` and is always marked `Secure` outside Development. API authentication failures return `401` or `403` rather than redirecting to an HTML login page.
+
+Only `User1` and `User2` are configured, as required by the challenge. Their password is verified with ASP.NET Core's `PasswordHasher`; plaintext credentials are not stored in application configuration. The configured hashes can be replaced through environment variables during deployment.
+
+Application code accesses the request identity through `ICurrentUser`. Neither clients nor LLM tools may provide the booking owner. Authenticated commands that modify state require an antiforgery cookie plus a request token sent through the `X-CSRF-TOKEN` header.
+
 ## Deliberately deferred
 
-This foundation does not include PostgreSQL, authentication endpoints, booking endpoints, tool calling, or React. Those behaviors remain in separate pull requests so each change is independently reviewable and keeps CI green.
+This foundation does not yet include PostgreSQL, booking endpoints, tool calling, or React. Those behaviors remain in separate pull requests so each change is independently reviewable and keeps CI green.

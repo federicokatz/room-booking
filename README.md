@@ -17,6 +17,24 @@ dotnet run --project src/RoomBooking.Api
 
 The API exposes `GET /health` as a readiness endpoint.
 
+## Authentication
+
+The challenge users are `User1` and `User2`; both use the password provided in
+the challenge specification. Password hashes, rather than plaintext passwords,
+are stored under `Authentication:Users` and can be overridden through
+environment variables such as `Authentication__Users__0__PasswordHash`.
+
+Authentication uses an HttpOnly same-origin cookie. The available endpoints are:
+
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `GET /api/auth/csrf`
+- `POST /api/auth/logout`
+
+Authenticated state-changing requests require the token returned by
+`GET /api/auth/csrf` in the `X-CSRF-TOKEN` header. The browser must retain the
+authentication and antiforgery cookies returned by the API.
+
 ## Verify the solution
 
 ```powershell
