@@ -22,7 +22,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       await onLogin(userName, password)
     } catch (caught) {
       setError(caught instanceof ApiError && caught.status === 401
-        ? 'Check the username and password, then try again.'
+        ? 'Invalid username or password.'
         : 'Sign-in is unavailable right now. Try again in a moment.')
     } finally {
       setIsSubmitting(false)

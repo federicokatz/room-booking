@@ -33,7 +33,9 @@ public sealed class CancelBookingTool(CancelBookingUseCase useCase) : IAgentTool
         var result = await useCase.ExecuteAsync(arguments.BookingId, cancellationToken);
 
         return result.IsSuccess
-            ? AgentToolJson.Success(result.Value, AgentEffects.BookingCancelled)
+            ? AgentToolJson.Success(
+                BookingToolResponse.From(result.Value),
+                AgentEffects.BookingCancelled)
             : AgentToolJson.Failure(result.Error!);
     }
 

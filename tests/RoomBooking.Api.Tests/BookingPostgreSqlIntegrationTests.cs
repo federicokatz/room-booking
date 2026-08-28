@@ -175,6 +175,26 @@ public class BookingPostgreSqlIntegrationTests : IDisposable
     }
 
     [TestMethod]
+    public async Task CreateBookingRejectsPastStartTimeWithStableCode()
+    {
+        using var client = CreateClient();
+        var csrfToken = await AuthenticateAsync(client, "User1");
+
+        using var response = await CreateBookingAsync(
+            client,
+            csrfToken,
+            "A",
+            new DateTimeOffset(2026, 8, 28, 11, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2026, 8, 28, 12, 0, 0, TimeSpan.Zero),
+            "Past meeting",
+            2);
+        var problem = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        problem.GetProperty("code").GetString().Should().Be("booking.start_must_be_in_future");
+    }
+
+    [TestMethod]
     public async Task RoomScheduleShowsOccupancyWithoutExposingOwner()
     {
         using var client = CreateClient();

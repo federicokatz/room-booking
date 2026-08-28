@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RoomBooking.Application.Bookings;
 using RoomBooking.Application.Bookings.CreateBooking;
 using RoomBooking.Application.Tests.Fakes;
 using RoomBooking.Domain.Bookings;
@@ -83,14 +84,38 @@ public class CreateBookingUseCaseTests
         result.Error.Should().Be(BookingErrors.Overlap);
     }
 
+    [TestMethod]
+    public async Task ExecuteRejectsBookingThatStartsInThePast()
+    {
+        var room = TestData.CreateRoom(RoomCode.A, 4);
+        var bookings = new FakeBookingRepository();
+        var useCase = CreateUseCase(
+            "User1",
+            room,
+            bookings,
+            new StubTimeProvider(TestData.Utc(11)));
+
+        var result = await useCase.ExecuteAsync(new CreateBookingCommand(
+            "A",
+            TestData.Utc(10),
+            TestData.Utc(11),
+            "Planning",
+            2));
+
+        result.Error.Should().Be(BookingApplicationErrors.StartMustBeInFuture);
+        bookings.Bookings.Should().BeEmpty();
+    }
+
     private static CreateBookingUseCase CreateUseCase(
         string? userName,
         Room room,
-        FakeBookingRepository bookings)
+        FakeBookingRepository bookings,
+        TimeProvider? timeProvider = null)
     {
         return new CreateBookingUseCase(
             new FakeCurrentUser(userName),
             new FakeRoomRepository([room]),
-            bookings);
+            bookings,
+            timeProvider ?? new StubTimeProvider(TestData.Utc(9)));
     }
 }

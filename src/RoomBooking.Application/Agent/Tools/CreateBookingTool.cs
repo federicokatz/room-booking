@@ -44,7 +44,9 @@ public sealed class CreateBookingTool(CreateBookingUseCase useCase) : IAgentTool
             cancellationToken);
 
         return result.IsSuccess
-            ? AgentToolJson.Success(result.Value, AgentEffects.BookingCreated)
+            ? AgentToolJson.Success(
+                BookingToolResponse.From(result.Value),
+                AgentEffects.BookingCreated)
             : AgentToolJson.Failure(result.Error!);
     }
 

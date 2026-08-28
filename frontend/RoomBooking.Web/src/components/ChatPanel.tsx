@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { FormEvent, KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Icon } from './Icon'
@@ -37,6 +37,17 @@ export function ChatPanel({ messages, isSending, error, onSend }: ChatPanelProps
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    await sendMessage()
+  }
+
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
+
+    event.preventDefault()
+    void sendMessage()
+  }
+
+  async function sendMessage() {
     const trimmed = message.trim()
     if (!trimmed || isSending) return
     setMessage('')
@@ -56,7 +67,7 @@ export function ChatPanel({ messages, isSending, error, onSend }: ChatPanelProps
       </div>
       <form className="chat-composer" onSubmit={handleSubmit}>
         <label className="sr-only" htmlFor="chat-message">Message the booking assistant</label>
-        <textarea ref={composerRef} id="chat-message" rows={1} placeholder="Ask about a room, a time, or a booking…" value={message} onChange={(event) => setMessage(event.target.value)} disabled={isSending} />
+        <textarea ref={composerRef} id="chat-message" rows={1} placeholder="Ask about a room, a time, or a booking…" value={message} onChange={(event) => setMessage(event.target.value)} onKeyDown={handleKeyDown} disabled={isSending} />
         <button className="send-button" type="submit" disabled={!message.trim() || isSending} aria-label="Send message"><Icon name="arrow-up" size={20} /></button>
       </form>
       <p className="chat-disclaimer">The assistant will ask for missing details before making any changes.</p>

@@ -16,7 +16,8 @@ public sealed record CreateBookingCommand(
 public sealed class CreateBookingUseCase(
     ICurrentUser currentUser,
     IRoomRepository roomRepository,
-    IBookingRepository bookingRepository)
+    IBookingRepository bookingRepository,
+    TimeProvider timeProvider)
 {
     public async Task<Result<BookingResponse>> ExecuteAsync(
         CreateBookingCommand command,
@@ -37,6 +38,11 @@ public sealed class CreateBookingUseCase(
         if (periodResult.IsFailure)
         {
             return Result.Failure<BookingResponse>(periodResult.Error!);
+        }
+
+        if (periodResult.Value.StartUtc <= timeProvider.GetUtcNow())
+        {
+            return Result.Failure<BookingResponse>(BookingApplicationErrors.StartMustBeInFuture);
         }
 
         var room = await roomRepository.GetByCodeAsync(roomCodeResult.Value, cancellationToken);

@@ -59,4 +59,19 @@ describe('App', () => {
     expect(screen.getByText('Room:')).toBeInTheDocument()
     await waitFor(() => expect(api.getMyBookings).toHaveBeenCalledTimes(2))
   })
+
+  it('sends a chat message with Enter while Shift+Enter keeps the composer open', async () => {
+    api.getCurrentUser.mockResolvedValue({ userName: 'User1' })
+    api.createChatSession.mockResolvedValue({ sessionId: 'session-1' })
+    api.sendChatMessage.mockResolvedValue({ assistantMessage: 'Done.', effects: [] })
+    render(<App />)
+
+    const composer = await screen.findByLabelText('Message the booking assistant')
+    fireEvent.change(composer, { target: { value: 'Book room A' } })
+    fireEvent.keyDown(composer, { key: 'Enter', shiftKey: true })
+    expect(api.sendChatMessage).not.toHaveBeenCalled()
+
+    fireEvent.keyDown(composer, { key: 'Enter' })
+    await waitFor(() => expect(api.sendChatMessage).toHaveBeenCalledWith('session-1', 'Book room A'))
+  })
 })
