@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using RoomBooking.Application.Abstractions.Authentication;
 using RoomBooking.Application.Abstractions.Persistence;
 using RoomBooking.Application.Abstractions.Time;
+using RoomBooking.Application.Agent;
 using RoomBooking.Application.Configuration;
+using RoomBooking.Infrastructure.Ai;
 using RoomBooking.Infrastructure.Authentication;
 using RoomBooking.Infrastructure.Persistence;
 using RoomBooking.Infrastructure.Persistence.Repositories;
@@ -44,6 +46,12 @@ public static class DependencyInjection
 
         services.AddSingleton<IPasswordHasher<ConfiguredUser>, PasswordHasher<ConfiguredUser>>();
         services.AddSingleton<IUserAuthenticator, ConfiguredUserAuthenticator>();
+
+        services
+            .AddOptions<AiOptions>()
+            .Bind(configuration.GetSection(AiOptions.SectionName));
+        services.AddHttpClient<IChatModel, GroqChatModel>(client =>
+            client.Timeout = TimeSpan.FromSeconds(30));
 
         var connectionString = configuration.GetConnectionString(DatabaseConnectionName);
         if (string.IsNullOrWhiteSpace(connectionString))
