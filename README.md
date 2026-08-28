@@ -35,6 +35,8 @@ Start PostgreSQL:
 docker compose up -d
 ```
 
+The root `.env` file is read by Docker Compose only. ASP.NET Core does not load `.env` files automatically; use User Secrets locally and environment variables in a deployed environment. `.env.example` documents the variable names.
+
 Store local secrets outside committed configuration:
 
 ```powershell
