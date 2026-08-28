@@ -7,7 +7,6 @@ using RoomBooking.Application.Bookings.ListAvailableRooms;
 using RoomBooking.Application.Bookings.ListMyBookings;
 using RoomBooking.Application.Rooms;
 using RoomBooking.Domain.Bookings;
-using RoomBooking.Domain.Common;
 
 namespace RoomBooking.Api.Bookings;
 
@@ -49,7 +48,9 @@ internal static class BookingEndpoints
             new ListAvailableRoomsQuery(startUtc, endUtc, attendees),
             cancellationToken);
 
-        return result.IsSuccess ? Results.Ok(result.Value) : ToProblem(result.Error!);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : BookingErrorMapper.ToProblem(result.Error!);
     }
 
     private static async Task<IResult> GetRoomScheduleAsync(
@@ -63,7 +64,9 @@ internal static class BookingEndpoints
             new GetRoomScheduleQuery(roomCode, startUtc, endUtc),
             cancellationToken);
 
-        return result.IsSuccess ? Results.Ok(result.Value) : ToProblem(result.Error!);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : BookingErrorMapper.ToProblem(result.Error!);
     }
 
     private static async Task<IResult> CreateBookingAsync(
@@ -82,7 +85,7 @@ internal static class BookingEndpoints
 
         return result.IsSuccess
             ? Results.Created($"/api/bookings/{result.Value.Id}", result.Value)
-            : ToProblem(result.Error!);
+            : BookingErrorMapper.ToProblem(result.Error!);
     }
 
     private static async Task<IResult> ListMyBookingsAsync(
@@ -91,7 +94,9 @@ internal static class BookingEndpoints
     {
         var result = await useCase.ExecuteAsync(cancellationToken);
 
-        return result.IsSuccess ? Results.Ok(result.Value) : ToProblem(result.Error!);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : BookingErrorMapper.ToProblem(result.Error!);
     }
 
     private static async Task<IResult> CancelBookingAsync(
@@ -101,28 +106,9 @@ internal static class BookingEndpoints
     {
         var result = await useCase.ExecuteAsync(bookingId, cancellationToken);
 
-        return result.IsSuccess ? Results.Ok(result.Value) : ToProblem(result.Error!);
-    }
-
-    private static IResult ToProblem(DomainError error)
-    {
-        var statusCode = error.Code switch
-        {
-            "authentication.required" => StatusCodes.Status401Unauthorized,
-            "room.not_found" or "booking.not_found" => StatusCodes.Status404NotFound,
-            "booking.not_owner" => StatusCodes.Status403Forbidden,
-            "booking.overlap" or "booking.already_cancelled" => StatusCodes.Status409Conflict,
-            _ => StatusCodes.Status400BadRequest
-        };
-
-        return Results.Problem(
-            statusCode: statusCode,
-            title: "Booking request failed",
-            detail: error.Description,
-            extensions: new Dictionary<string, object?>
-            {
-                ["code"] = error.Code
-            });
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : BookingErrorMapper.ToProblem(result.Error!);
     }
 
     private sealed record CreateBookingRequest(
