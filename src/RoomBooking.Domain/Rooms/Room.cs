@@ -4,6 +4,11 @@ namespace RoomBooking.Domain.Rooms;
 
 public sealed class Room
 {
+    private Room()
+    {
+        Code = null!;
+    }
+
     private Room(Guid id, RoomCode code, int capacity)
     {
         Id = id;
@@ -11,11 +16,11 @@ public sealed class Room
         Capacity = capacity;
     }
 
-    public Guid Id { get; }
+    public Guid Id { get; private set; }
 
-    public RoomCode Code { get; }
+    public RoomCode Code { get; private set; }
 
-    public int Capacity { get; }
+    public int Capacity { get; private set; }
 
     public static Result<Room> Create(Guid id, RoomCode? code, int capacity)
     {

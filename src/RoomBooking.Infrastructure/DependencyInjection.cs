@@ -1,16 +1,22 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity;
 using RoomBooking.Application.Abstractions.Authentication;
+using RoomBooking.Application.Abstractions.Persistence;
 using RoomBooking.Application.Abstractions.Time;
 using RoomBooking.Application.Configuration;
 using RoomBooking.Infrastructure.Authentication;
+using RoomBooking.Infrastructure.Persistence;
+using RoomBooking.Infrastructure.Persistence.Repositories;
 using RoomBooking.Infrastructure.Time;
 
 namespace RoomBooking.Infrastructure;
 
 public static class DependencyInjection
 {
+    private const string DatabaseConnectionName = "RoomBooking";
+
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -38,6 +44,18 @@ public static class DependencyInjection
 
         services.AddSingleton<IPasswordHasher<ConfiguredUser>, PasswordHasher<ConfiguredUser>>();
         services.AddSingleton<IUserAuthenticator, ConfiguredUserAuthenticator>();
+
+        var connectionString = configuration.GetConnectionString(DatabaseConnectionName);
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                $"ConnectionStrings:{DatabaseConnectionName} must be configured.");
+        }
+
+        services.AddDbContext<RoomBookingDbContext>(options =>
+            options.UseNpgsql(connectionString));
+        services.AddScoped<IRoomRepository, RoomRepository>();
+        services.AddScoped<IBookingRepository, BookingRepository>();
 
         return services;
     }

@@ -7,6 +7,13 @@ public sealed class Booking
 {
     public const int MaxTitleLength = 200;
 
+    private Booking()
+    {
+        OwnerId = string.Empty;
+        Title = string.Empty;
+        Period = null!;
+    }
+
     private Booking(
         Guid id,
         Guid roomId,
@@ -24,17 +31,17 @@ public sealed class Booking
         Status = BookingStatus.Active;
     }
 
-    public Guid Id { get; }
+    public Guid Id { get; private set; }
 
-    public Guid RoomId { get; }
+    public Guid RoomId { get; private set; }
 
-    public string OwnerId { get; }
+    public string OwnerId { get; private set; }
 
-    public string Title { get; }
+    public string Title { get; private set; }
 
-    public int Attendees { get; }
+    public int Attendees { get; private set; }
 
-    public BookingPeriod Period { get; }
+    public BookingPeriod Period { get; private set; }
 
     public BookingStatus Status { get; private set; }
 

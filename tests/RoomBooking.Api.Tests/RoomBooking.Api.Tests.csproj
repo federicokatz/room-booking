@@ -16,10 +16,12 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MSTest.TestAdapter" PrivateAssets="all" />
     <PackageReference Include="MSTest.TestFramework" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\RoomBooking.Api\RoomBooking.Api.csproj" />
+    <ProjectReference Include="..\..\src\RoomBooking.Infrastructure\RoomBooking.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
