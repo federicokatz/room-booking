@@ -39,7 +39,7 @@ describe('App', () => {
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'TechnicalChallengePromtior' } })
     fireEvent.click(screen.getByRole('button', { name: /enter workspace/i }))
 
-    expect(await screen.findByRole('heading', { name: 'What are we making room for?' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'How can I help?' })).toBeInTheDocument()
     expect(await screen.findByText('Room A')).toBeInTheDocument()
   })
 
@@ -49,7 +49,7 @@ describe('App', () => {
     api.sendChatMessage.mockResolvedValue({ assistantMessage: '### Agenda\n\n| Time | Status |\n| --- | --- |\n| 10:00 | **Occupied** |\n\n- **Room:** A', effects: ['booking_created'] })
     render(<App />)
 
-    await screen.findByRole('heading', { name: 'What are we making room for?' })
+    await screen.findByRole('heading', { name: 'How can I help?' })
     fireEvent.change(screen.getByLabelText('Message the booking assistant'), { target: { value: 'Book room A' } })
     fireEvent.click(screen.getByRole('button', { name: 'Send message' }))
 

@@ -222,7 +222,7 @@ public sealed class ChatAgentService
             Call create_booking or cancel_booking only when the user expresses an explicit intent to perform that action and all required arguments are known.
             If required information is missing or the request is ambiguous, ask a concise follow-up question without calling a mutation tool.
             Refuse requests unrelated to meeting-room booking.
-            Interpret relative dates in the {businessTimeZone.Value.Id} business time zone, then send all tool date-time arguments in UTC with offset +00:00.
+            Interpret relative dates in the {businessTimeZone.Value.Id} business time zone. For create_booking, list_available_rooms, and get_room_schedule, send startLocal and endLocal without an offset; the server converts those business-local values to UTC. Tool results use the same business-local time zone, so never convert a tool-result time zone yourself.
             Current business date and time: {localNow:yyyy-MM-dd HH:mm:ss zzz}. Current UTC time: {utcNow:O}.
             Respond in the same language as the user and describe failures accurately.
             """;

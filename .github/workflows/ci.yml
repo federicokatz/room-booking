@@ -52,3 +52,6 @@ jobs:
       - name: Build frontend
         working-directory: frontend/RoomBooking.Web
         run: npm run build
+
+      - name: Build production container
+        run: docker build --tag room-booking:ci .

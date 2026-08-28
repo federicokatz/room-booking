@@ -17,6 +17,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -24,6 +26,19 @@ app.MapGet("/health", () => Results.Ok(new { Status = "Healthy" })).AllowAnonymo
 app.MapAuthenticationEndpoints();
 app.MapBookingEndpoints();
 app.MapChatEndpoints();
+
+app.MapFallback(async context =>
+{
+    if (context.Request.Path.StartsWithSegments("/api"))
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        return;
+    }
+
+    await context.Response.SendFileAsync(
+        Path.Combine(app.Environment.WebRootPath, "index.html"),
+        context.RequestAborted);
+}).AllowAnonymous();
 
 app.Run();
 

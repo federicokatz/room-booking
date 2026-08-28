@@ -41,7 +41,7 @@ public class ChatAgentServiceTests
         model.Enqueue(FinalResponse("¿Cuántas personas asistirán?"));
         model.Enqueue(ToolResponse(
             AgentToolNames.CreateBooking,
-            "{\"roomCode\":\"A\",\"startUtc\":\"2026-09-02T13:00:00+00:00\",\"endUtc\":\"2026-09-02T14:00:00+00:00\",\"title\":\"Planning\",\"attendees\":3}"));
+            "{\"roomCode\":\"A\",\"startLocal\":\"2026-09-02T10:00:00\",\"endLocal\":\"2026-09-02T11:00:00\",\"title\":\"Planning\",\"attendees\":3}"));
         model.Enqueue(FinalResponse("La sala A quedó reservada."));
         var createTool = new FakeAgentTool(
             AgentToolNames.CreateBooking,
@@ -323,6 +323,7 @@ public class ChatAgentServiceTests
         systemMessage.Role.Should().Be(ChatMessageRole.System);
         systemMessage.Content.Should().Contain("only purpose");
         systemMessage.Content.Should().Contain("UTC");
+        systemMessage.Content.Should().Contain("startLocal");
         systemMessage.Content.Should().Contain("2026-09-01");
     }
 
