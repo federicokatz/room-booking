@@ -1,0 +1,110 @@
+/* Workspace */
+.workspace-page {
+  max-width: 1480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 3.2rem) 2.5rem;
+}
+
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 98px;
+  border-bottom: 1px solid var(--line);
+}
+
+.workspace-context, .workspace-meta, .user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.workspace-brand {
+  color: var(--ink);
+}
+
+.location-label {
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: .64rem;
+  letter-spacing: .09em;
+}
+
+.user-menu {
+  gap: .55rem;
+  font-size: .79rem;
+  font-weight: 700;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  color: var(--white);
+  background: var(--teal);
+  font-family: "DM Mono", monospace;
+  font-size: .75rem;
+}
+
+.user-menu button {
+  display: grid;
+  place-items: center;
+  margin-left: .35rem;
+  padding: .35rem;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+}
+
+.user-menu button:hover {
+  color: var(--copper);
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, .78fr) minmax(410px, 1.55fr) minmax(270px, .95fr);
+  gap: 1.2rem;
+  padding-top: 2.2rem;
+}
+
+.panel, .chat-panel {
+  min-height: 560px;
+  border: 1px solid var(--line);
+  background: rgba(255,254,250,.68);
+  box-shadow: 0 5px 20px rgba(18,60,74,.025);
+}
+
+.panel {
+  padding: 1.5rem;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panel h2, .chat-header h2 {
+  margin: .35rem 0 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+
+.panel-count {
+  display: grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--teal);
+  background: #e0efea;
+  font-family: "DM Mono", monospace;
+  font-size: .72rem;
+}

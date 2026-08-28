@@ -1,0 +1,105 @@
+/* Bookings */
+.booking-list {
+  display: grid;
+  gap: .7rem;
+  margin-top: 1.8rem;
+}
+
+.booking-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .7rem;
+  padding: .8rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.booking-card:first-child {
+  padding-top: 0;
+}
+
+.booking-copy {
+  min-width: 0;
+}
+
+.booking-copy h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-card p span {
+  margin: 0 .1rem;
+}
+
+.booking-attendees {
+  display: inline-flex;
+  align-items: center;
+  gap: .28rem;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: .67rem;
+}
+
+.empty-bookings {
+  display: grid;
+  justify-items: start;
+  gap: .35rem;
+  margin-top: 2.4rem;
+  padding: 1.1rem;
+  border-left: 2px solid var(--copper);
+  background: rgba(250,227,213,.42);
+}
+
+.empty-mark {
+  color: var(--copper);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 2rem;
+  line-height: .7;
+}
+
+.empty-bookings p {
+  margin: .5rem 0 0;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.empty-bookings span {
+  color: var(--muted);
+  font-size: .7rem;
+  line-height: 1.5;
+}
+
+.room-skeleton, .booking-skeleton {
+  pointer-events: none;
+}
+
+.skeleton-box, .skeleton-lines span {
+  background: linear-gradient(90deg, #e6ece8, #f5f6f2, #e6ece8);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s infinite;
+}
+
+.skeleton-box {
+  width: 35px;
+  height: 35px;
+  border-radius: 3px;
+}
+
+.skeleton-lines {
+  display: grid;
+  gap: .35rem;
+  width: 100%;
+}
+
+.skeleton-lines span {
+  display: block;
+  width: 62%;
+  height: 8px;
+  border-radius: 20px;
+}
+
+.skeleton-lines span:last-child {
+  width: 42%;
+  height: 7px;
+}

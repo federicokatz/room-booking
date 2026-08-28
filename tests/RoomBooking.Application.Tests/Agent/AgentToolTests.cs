@@ -23,13 +23,15 @@ public class AgentToolTests
         var tool = new CreateBookingTool(new CreateBookingUseCase(
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
-            bookings));
+            bookings,
+            new StubTimeProvider(TestData.Utc(9))));
 
         var result = await tool.ExecuteAsync(
             "{\"roomCode\":\"A\",\"startUtc\":\"2026-09-01T10:00:00+00:00\",\"endUtc\":\"2026-09-01T11:00:00+00:00\",\"title\":\"Interview\",\"attendees\":3}");
 
         ReadSuccess(result).Should().BeTrue();
         result.Effect.Should().Be(AgentEffects.BookingCreated);
+        ReadData(result).TryGetProperty("id", out _).Should().BeFalse();
         bookings.Bookings.Should().ContainSingle()
             .Which.OwnerId.Should().Be("User1");
     }
@@ -42,7 +44,8 @@ public class AgentToolTests
         var tool = new CreateBookingTool(new CreateBookingUseCase(
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
-            bookings));
+            bookings,
+            new StubTimeProvider(TestData.Utc(9))));
 
         var result = await tool.ExecuteAsync(
             "{\"roomCode\":\"A\",\"startUtc\":\"2026-09-01T10:00:00+00:00\",\"endUtc\":\"2026-09-01T11:00:00+00:00\",\"title\":\"Interview\",\"attendees\":3,\"userId\":\"User2\"}");
@@ -60,7 +63,8 @@ public class AgentToolTests
         var tool = new CreateBookingTool(new CreateBookingUseCase(
             new FakeCurrentUser("User1"),
             new FakeRoomRepository([room]),
-            bookings));
+            bookings,
+            new StubTimeProvider(TestData.Utc(9))));
 
         var result = await tool.ExecuteAsync("{not-json}");
 
@@ -190,6 +194,7 @@ public class AgentToolTests
 
         ReadSuccess(result).Should().BeTrue();
         result.Effect.Should().Be(AgentEffects.BookingCancelled);
+        ReadData(result).TryGetProperty("id", out _).Should().BeFalse();
         bookings.SaveChangesCount.Should().Be(1);
     }
 
@@ -224,7 +229,11 @@ public class AgentToolTests
 
         return
         [
-            new CreateBookingTool(new CreateBookingUseCase(currentUser, rooms, bookings)),
+            new CreateBookingTool(new CreateBookingUseCase(
+                currentUser,
+                rooms,
+                bookings,
+                timeProvider)),
             new ListAvailableRoomsTool(new ListAvailableRoomsUseCase(rooms, bookings)),
             new GetRoomScheduleTool(new GetRoomScheduleUseCase(rooms, bookings)),
             new ListMyBookingsTool(new ListMyBookingsUseCase(

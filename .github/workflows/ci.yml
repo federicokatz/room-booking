@@ -33,3 +33,22 @@ jobs:
 
       - name: Run tests
         run: dotnet test RoomBooking.sln --configuration Release --no-build --no-restore
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/RoomBooking.Web/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend/RoomBooking.Web
+        run: npm ci
+
+      - name: Run frontend tests
+        working-directory: frontend/RoomBooking.Web
+        run: npm test
+
+      - name: Build frontend
+        working-directory: frontend/RoomBooking.Web
+        run: npm run build

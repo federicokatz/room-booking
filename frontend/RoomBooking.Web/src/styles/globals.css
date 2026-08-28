@@ -1,0 +1,79 @@
+/* Base */
+:root {
+  --ink: #123c4a;
+  --ink-deep: #0a2b36;
+  --teal: #1b6970;
+  --copper: #d8784a;
+  --copper-soft: #fae3d5;
+  --paper: #f5f5ef;
+  --white: #fffefa;
+  --line: rgba(18, 60, 74, .13);
+  --muted: #64777c;
+  --shadow: 0 20px 60px rgba(18, 60, 74, .10);
+  color: var(--ink);
+  font-family: Manrope, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--paper);
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 3px solid rgba(216, 120, 74, .55);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: .42rem;
+  margin: 0;
+  color: var(--teal);
+  font-family: "DM Mono", monospace;
+  font-size: .67rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  line-height: 1.3;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ea570;
+  box-shadow: 0 0 0 4px rgba(78, 165, 112, .12);
+}

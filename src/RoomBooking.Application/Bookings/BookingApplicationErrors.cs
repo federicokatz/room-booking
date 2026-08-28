@@ -16,6 +16,10 @@ public static class BookingApplicationErrors
         "booking.not_found",
         "The requested booking was not found.");
 
+    public static DomainError StartMustBeInFuture { get; } = new(
+        "booking.start_must_be_in_future",
+        "Booking start time must be in the future.");
+
     public static DomainError RangeStartMustBeUtc { get; } = new(
         "schedule.range.start_must_be_utc",
         "Schedule start must be expressed in UTC.");

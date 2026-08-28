@@ -1,0 +1,49 @@
+/* Loading and motion */
+.app-loading {
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+  color: var(--muted);
+  background: var(--paper);
+  font-family: "DM Mono", monospace;
+  font-size: .75rem;
+}
+
+.loading-mark {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(18,60,74,.15);
+  border-top-color: var(--copper);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: .25;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rooms-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.rooms-panel .panel-note {
+  margin-top: auto;
+}
