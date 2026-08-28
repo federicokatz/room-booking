@@ -65,6 +65,18 @@ The API starts at `http://localhost:5226` and exposes `GET /health`. Generate a 
 dotnet ef migrations add <MigrationName> --project src/RoomBooking.Infrastructure --startup-project src/RoomBooking.Api --output-dir Persistence/Migrations
 ```
 
+### React client
+
+In a second terminal, start the React client after the API is running:
+
+```powershell
+cd frontend/RoomBooking.Web
+npm install
+npm run dev
+```
+
+Vite serves the client at `http://localhost:5173` and proxies `/api` requests to the local ASP.NET Core API. This preserves the same-origin cookie and antiforgery flow during development. The browser UI displays rooms and the current user's bookings, while all booking creation and cancellation continue to happen through the conversational assistant.
+
 ## Booking behavior
 
 The five rooms are seeded as system data with deterministic capacities:
@@ -127,11 +139,15 @@ The message endpoint returns an assistant message and, when appropriate, an `eff
 ```powershell
 dotnet build RoomBooking.sln --configuration Release --no-restore
 dotnet test RoomBooking.sln --configuration Release --no-build --no-restore
+
+cd frontend/RoomBooking.Web
+npm test
+npm run build
 ```
 
-Tests use MSTest and FluentAssertions. The agent tests use a deterministic `FakeChatModel`, so CI never calls Groq, requires an API key, or depends on Internet access.
+Backend tests use MSTest and FluentAssertions; frontend tests use Vitest and React Testing Library. The agent tests use a deterministic `FakeChatModel`, so CI never calls Groq, requires an API key, or depends on Internet access.
 
-PostgreSQL integration tests use Testcontainers and therefore require Docker. When Docker is unavailable locally they are reported as inconclusive; in CI they remain mandatory and fail if PostgreSQL cannot be started. The GitHub Actions workflow restores locked dependencies, builds in Release, and runs all tests for pull requests and pushes targeting `main`.
+PostgreSQL integration tests use Testcontainers and therefore require Docker. When Docker is unavailable locally they are reported as inconclusive; in CI they remain mandatory and fail if PostgreSQL cannot be started. The GitHub Actions workflow restores locked .NET and npm dependencies, builds both applications, and runs all tests for pull requests and pushes targeting `main`.
 
 ## Documentation
 

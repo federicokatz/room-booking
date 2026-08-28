@@ -13,6 +13,7 @@ This prevents the model from becoming the source of truth for availability or au
 3. **Authentication** — Added the two challenge users, password-hash verification, same-origin HttpOnly cookies, `ICurrentUser`, and antiforgery protection.
 4. **Booking workflow** — Added PostgreSQL persistence, seeded rooms, booking endpoints, ownership checks, cancellation, availability, schedules, and the exclusion constraint for concurrent conflicts.
 5. **Tool-calling assistant** — Added Groq integration behind `IChatModel`, typed tools that reuse use cases, owner-scoped in-memory sessions, bounded orchestration, and fake-model tests.
+6. **React workspace** — Added a Vite + React client with cookie/CSRF-aware API access, login, room and personal-booking summaries, and a conversational interface that refreshes after booking effects.
 
 ## Key decisions
 
@@ -21,6 +22,7 @@ This prevents the model from becoming the source of truth for availability or au
 - **Cookie authentication:** React and API are same-origin, so a cookie is simpler and more appropriate than JWT for this scope.
 - **Groq through an internal contract:** Groq's free tier is suitable for the challenge, while the provider remains replaceable and CI does not require a key.
 - **LLM has no business authority:** the model requests tools; Application and Domain decide the outcome.
+- **Thin React client:** the browser presents authenticated workspace data and sends conversational messages. It neither calculates availability nor calls booking mutation endpoints directly.
 - **Bounded chat execution:** sessions, history, iterations, and tool calls have explicit limits. This avoids unbounded loops and preserves a valid tool-calling conversation sequence.
 
 ## Main challenges and how they were addressed
@@ -37,4 +39,4 @@ This prevents the model from becoming the source of truth for availability or au
 
 The project uses MSTest and FluentAssertions. Tests cover Domain invariants, Application use cases, API authentication and CSRF, real PostgreSQL behavior through Testcontainers, and agent orchestration with a fake model.
 
-The CI workflow executes locked restore, Release build, and the full test suite on pull requests and pushes to `main`.
+The CI workflow executes locked .NET restore, Release build, backend tests, `npm ci`, frontend tests, and the React production build on pull requests and pushes to `main`.

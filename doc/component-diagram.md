@@ -1,6 +1,6 @@
 # Component diagram
 
-This diagram follows a user message from the browser to the assistant response. The React client is introduced in the next phase; the current backend API already exposes the same HTTP contract.
+This diagram follows a user message from the React client to the assistant response. The browser displays rooms and the signed-in user's bookings, but it does not make booking decisions or call booking mutation endpoints directly.
 
 ```mermaid
 flowchart LR
@@ -26,7 +26,7 @@ flowchart LR
 
 ## Responsibilities
 
-1. The browser sends the user message with its authenticated cookie and antiforgery token.
+1. The React client sends the user message with its authenticated cookie and antiforgery token. It refreshes its read-only workspace data after a booking effect.
 2. The API authenticates the request and resolves `ICurrentUser` from the server context.
 3. `ChatAgentService` loads the user-owned session and asks the model to answer or request one of five typed tools.
 4. A requested tool delegates to an existing Application use case; it never talks directly to PostgreSQL and never receives a user identifier.
