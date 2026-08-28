@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using RoomBooking.Api.Security;
 using RoomBooking.Application.Abstractions.Authentication;
 
 namespace RoomBooking.Api.Authentication;
@@ -19,8 +20,9 @@ internal static class AuthenticationEndpoints
         group.MapGet("/csrf", GetCsrfToken).RequireAuthorization();
         group.MapPost(
                 "/logout",
-                (Func<HttpContext, IAntiforgery, Task<IResult>>)LogoutAsync)
-            .RequireAuthorization();
+                (Func<HttpContext, Task<IResult>>)LogoutAsync)
+            .RequireAuthorization()
+            .RequireValidAntiforgeryToken();
 
         return endpoints;
     }
@@ -72,19 +74,8 @@ internal static class AuthenticationEndpoints
         return Results.Ok(new CsrfTokenResponse(tokens.RequestToken!));
     }
 
-    private static async Task<IResult> LogoutAsync(
-        HttpContext httpContext,
-        IAntiforgery antiforgery)
+    private static async Task<IResult> LogoutAsync(HttpContext httpContext)
     {
-        try
-        {
-            await antiforgery.ValidateRequestAsync(httpContext);
-        }
-        catch (AntiforgeryValidationException)
-        {
-            return Results.BadRequest();
-        }
-
         await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
         return Results.NoContent();

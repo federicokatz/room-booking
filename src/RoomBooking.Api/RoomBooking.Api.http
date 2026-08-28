@@ -1,6 +1,55 @@
-@RoomBooking.Api_HostAddress = http://localhost:5226
+@host = http://localhost:5226
 
-GET {{RoomBooking.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Health
+GET {{host}}/health
 
-###
+### Login (the HTTP client retains the authentication cookie)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "userName": "User1",
+  "password": "TechnicalChallengePromtior"
+}
+
+### Current user
+GET {{host}}/api/auth/me
+
+### Obtain an antiforgery token before state-changing requests
+# @name csrf
+GET {{host}}/api/auth/csrf
+
+> {% client.global.set("csrfToken", response.body.token); %}
+
+### List all rooms
+GET {{host}}/api/rooms
+
+### List available rooms
+GET {{host}}/api/rooms/available?startUtc=2026-09-01T13:00:00Z&endUtc=2026-09-01T14:00:00Z&attendees=4
+
+### View room schedule
+GET {{host}}/api/rooms/A/schedule?startUtc=2026-09-01T12:00:00Z&endUtc=2026-09-01T18:00:00Z
+
+### Create a booking
+POST {{host}}/api/bookings
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrfToken}}
+
+{
+  "roomCode": "A",
+  "startUtc": "2026-09-01T13:00:00Z",
+  "endUtc": "2026-09-01T14:00:00Z",
+  "title": "Interview with John Doe",
+  "attendees": 4
+}
+
+### List current user's upcoming bookings
+GET {{host}}/api/bookings/mine
+
+### Cancel a booking (replace the id)
+POST {{host}}/api/bookings/00000000-0000-0000-0000-000000000000/cancel
+X-CSRF-TOKEN: {{csrfToken}}
+
+### Logout
+POST {{host}}/api/auth/logout
+X-CSRF-TOKEN: {{csrfToken}}

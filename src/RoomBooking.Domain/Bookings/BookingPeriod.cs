@@ -4,6 +4,10 @@ namespace RoomBooking.Domain.Bookings;
 
 public sealed record BookingPeriod
 {
+    private BookingPeriod()
+    {
+    }
+
     private BookingPeriod(DateTimeOffset startUtc, DateTimeOffset endUtc)
     {
         StartUtc = startUtc;
@@ -14,9 +18,9 @@ public sealed record BookingPeriod
 
     public static TimeSpan MaximumDuration { get; } = TimeSpan.FromHours(3);
 
-    public DateTimeOffset StartUtc { get; }
+    public DateTimeOffset StartUtc { get; private set; }
 
-    public DateTimeOffset EndUtc { get; }
+    public DateTimeOffset EndUtc { get; private set; }
 
     public TimeSpan Duration => EndUtc - StartUtc;
 

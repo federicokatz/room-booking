@@ -1,0 +1,6 @@
+root = true
+
+# EF Core scaffolds arrays inside migration methods. CA1861 is valuable for
+# application code, but not actionable in generated migration source.
+[src/RoomBooking.Infrastructure/Persistence/Migrations/*.cs]
+dotnet_diagnostic.CA1861.severity = none
