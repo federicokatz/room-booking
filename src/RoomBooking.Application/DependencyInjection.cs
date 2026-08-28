@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using RoomBooking.Application.Agent;
+using RoomBooking.Application.Agent.Tools;
 using RoomBooking.Application.Bookings.CancelBooking;
 using RoomBooking.Application.Bookings.CreateBooking;
 using RoomBooking.Application.Bookings.GetRoomSchedule;
@@ -21,6 +23,13 @@ public static class DependencyInjection
         services.AddScoped<ListMyBookingsUseCase>();
         services.AddScoped<CancelBookingUseCase>();
         services.AddScoped<ListRoomsUseCase>();
+        services.AddSingleton<ChatSessionStore>();
+        services.AddScoped<IAgentTool, CreateBookingTool>();
+        services.AddScoped<IAgentTool, ListAvailableRoomsTool>();
+        services.AddScoped<IAgentTool, GetRoomScheduleTool>();
+        services.AddScoped<IAgentTool, ListMyBookingsTool>();
+        services.AddScoped<IAgentTool, CancelBookingTool>();
+        services.AddScoped<ChatAgentService>();
 
         return services;
     }

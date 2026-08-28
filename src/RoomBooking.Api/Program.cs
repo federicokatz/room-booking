@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using RoomBooking.Api.Authentication;
 using RoomBooking.Api.Bookings;
+using RoomBooking.Api.Chat;
 using RoomBooking.Application;
 using RoomBooking.Infrastructure;
 
@@ -22,6 +23,7 @@ app.UseAuthorization();
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy" })).AllowAnonymous();
 app.MapAuthenticationEndpoints();
 app.MapBookingEndpoints();
+app.MapChatEndpoints();
 
 app.Run();
 
