@@ -23,7 +23,7 @@ function BookingCard({ booking }: { booking: Booking }) {
     <article className="booking-card">
       <div className="booking-room">{booking.roomCode}</div>
       <div className="booking-copy"><h3>{booking.title}</h3><p><Icon name="calendar" size={14} /> {date} <span>·</span> <Icon name="clock" size={14} /> {time.format(start)}–{time.format(end)}</p></div>
-      <span className="booking-attendees">{booking.attendees}</span>
+      <span className="booking-attendees" aria-label={`${booking.attendees} attendees`}><Icon name="users" size={14} /> {booking.attendees}</span>
     </article>
   )
 }

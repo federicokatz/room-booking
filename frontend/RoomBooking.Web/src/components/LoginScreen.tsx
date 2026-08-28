@@ -36,18 +36,16 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         <div className="intro-orbit orbit-two" />
         <div className="login-brand"><BrandMark /><span>ROOM BOOKING</span></div>
         <div className="intro-copy">
-          <p className="eyebrow"><Icon name="sparkle" size={15} /> CUBO ITAÚ · MONTEVIDEO</p>
+          <p className="eyebrow">CUBO ITAÚ · MONTEVIDEO</p>
           <h1>Make space for <em>better</em> work.</h1>
           <p>One conversation is all it takes to find, reserve, or adjust the room your team needs.</p>
         </div>
-        <div className="intro-footnote"><span className="status-dot" /> Five rooms, one calm workspace.</div>
       </section>
 
       <section className="login-panel">
         <div className="login-card">
           <p className="eyebrow">WELCOME BACK</p>
           <h2>Enter your workspace</h2>
-          <p className="login-description">Use the challenge account assigned to you.</p>
           <form onSubmit={handleSubmit}>
             <label>
               Username
@@ -62,7 +60,6 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               {isSubmitting ? 'Entering workspace…' : <>Enter workspace <Icon name="arrow-up" /></>}
             </button>
           </form>
-          <p className="login-hint">This assistant only handles meeting-room bookings.</p>
         </div>
       </section>
     </main>
