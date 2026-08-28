@@ -1,0 +1,27 @@
+/* Brand */
+.brand-mark {
+  display: grid;
+  grid-template-columns: repeat(3, 5px);
+  align-items: end;
+  gap: 2px;
+  width: 19px;
+  height: 20px;
+}
+
+.brand-mark span {
+  display: block;
+  background: var(--copper);
+  border-radius: 10px;
+}
+
+.brand-mark span:nth-child(1) {
+  height: 9px;
+}
+
+.brand-mark span:nth-child(2) {
+  height: 16px;
+}
+
+.brand-mark span:nth-child(3) {
+  height: 12px;
+}

@@ -1,0 +1,127 @@
+/* Responsive layout */
+@media (min-width: 1031px) {
+  .workspace-page {
+    display: grid;
+    height: 100dvh;
+    min-height: 0;
+    grid-template-rows: 98px minmax(0, 1fr);
+  }
+  .workspace-header {
+    min-height: 0;
+  }
+  .workspace-grid {
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .panel, .chat-panel {
+    min-height: 0;
+    height: 100%;
+  }
+  .rooms-panel, .bookings-panel {
+    overflow-y: auto;
+  }
+  .chat-panel {
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+  }
+  .chat-thread {
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+@media (max-width: 1030px) {
+  .workspace-grid {
+    grid-template-columns: minmax(200px, .75fr) minmax(400px, 1.4fr);
+  }
+  .bookings-panel {
+    grid-column: 1 / -1;
+    min-height: auto;
+  }
+  .booking-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .booking-card:first-child {
+    padding-top: .8rem;
+  }
+  .login-page {
+    grid-template-columns: 1fr .85fr;
+  }
+  .login-intro {
+    padding-inline: 3rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .login-page {
+    display: block;
+  }
+  .login-intro {
+    min-height: 45vh;
+    padding: 2rem;
+  }
+  .intro-copy {
+    margin: auto 0 1rem;
+    padding: 3rem 0 1.5rem;
+  }
+  .intro-copy h1 {
+    font-size: clamp(3rem, 14vw, 4.8rem);
+  }
+  .login-panel {
+    min-height: 55vh;
+    padding: 3rem 2rem;
+  }
+  .workspace-page {
+    padding-inline: 1rem;
+  }
+  .workspace-header {
+    min-height: 78px;
+  }
+  .location-label {
+    display: none;
+  }
+  .workspace-grid {
+    grid-template-columns: 1fr;
+    padding-top: 1rem;
+  }
+  .panel, .chat-panel {
+    min-height: auto;
+  }
+  .rooms-panel {
+    order: 1;
+  }
+  .chat-panel {
+    order: 2;
+    min-height: 570px;
+  }
+  .bookings-panel {
+    order: 3;
+  }
+  .room-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .room-card:last-child {
+    grid-column: 1 / -1;
+  }
+  .booking-list {
+    grid-template-columns: 1fr;
+  }
+  .chat-thread {
+    max-height: 350px;
+  }
+  .workspace-meta {
+    gap: .5rem;
+  }
+  .user-menu > span:not(.avatar) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
