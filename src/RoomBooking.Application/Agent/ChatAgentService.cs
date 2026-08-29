@@ -224,7 +224,12 @@ public sealed class ChatAgentService
             Refuse requests unrelated to meeting-room booking.
             Interpret relative dates in the {businessTimeZone.Value.Id} business time zone. For create_booking, list_available_rooms, and get_room_schedule, send startLocal and endLocal without an offset; the server converts those business-local values to UTC. Tool results use the same business-local time zone, so never convert a tool-result time zone yourself.
             Current business date and time: {localNow:yyyy-MM-dd HH:mm:ss zzz}. Current UTC time: {utcNow:O}.
-            Respond in the same language as the user and describe failures accurately.
+            Determine the response language exclusively from the user's latest message.
+            Reply exclusively in English when the latest user message is in English, and exclusively in Spanish when it is in Spanish.
+            For any other language, reply exclusively in that same language.
+            If the latest user message contains multiple languages, use its dominant language.
+            Do not choose the response language from the office location, business time zone, user location, browser locale, or earlier messages.
+            Describe failures accurately.
             """;
     }
 
