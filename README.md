@@ -2,6 +2,8 @@
 
 Meeting-room booking assistant built for the Promtior technical challenge. Authenticated users manage room bookings through a conversational interface with controlled LLM tool calling.
 
+**Live demo:** [room-booking-production-6b50.up.railway.app](https://room-booking-production-6b50.up.railway.app/)
+
 ## What it does
 
 - Authenticates User1 and User2 using the credentials defined by the challenge.
@@ -81,7 +83,7 @@ docker build --tag room-booking:local .
 
 ## Deploy
 
-The root [Dockerfile](Dockerfile) builds React and serves it from ASP.NET Core, so production is one application service plus PostgreSQL. For Railway, configure `ConnectionStrings__RoomBooking` and `AI__ApiKey` in the platform variable store, apply EF Core migrations manually, and deploy the root Dockerfile. Migrations never run automatically at startup.
+The root [Dockerfile](Dockerfile) builds React and serves it from ASP.NET Core, so production is one application service plus PostgreSQL. For Railway, configure `ConnectionStrings__RoomBooking`, `AI__ApiKey`, and `ASPNETCORE_FORWARDEDHEADERS_ENABLED=true` in the platform variable store. The forwarded-headers setting lets ASP.NET Core recognize Railway's HTTPS proxy for secure cookies and antiforgery. Apply EF Core migrations manually and deploy the root Dockerfile. Migrations never run automatically at startup.
 
 ## Documentation
 

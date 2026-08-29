@@ -310,7 +310,7 @@ public class ChatAgentServiceTests
     }
 
     [TestMethod]
-    public async Task SystemPromptContainsScopeAndConfiguredTimeZoneContext()
+    public async Task SystemPromptContainsScopeTimeZoneAndLanguagePolicy()
     {
         var model = new FakeChatModel();
         model.Enqueue(FinalResponse("No puedo ayudar con eso."));
@@ -325,6 +325,10 @@ public class ChatAgentServiceTests
         systemMessage.Content.Should().Contain("UTC");
         systemMessage.Content.Should().Contain("startLocal");
         systemMessage.Content.Should().Contain("2026-09-01");
+        systemMessage.Content.Should().Contain("latest message");
+        systemMessage.Content.Should().Contain("exclusively in English");
+        systemMessage.Content.Should().Contain("dominant language");
+        systemMessage.Content.Should().Contain("business time zone");
     }
 
     private static ChatAgentService CreateService(
